@@ -7,9 +7,9 @@ export default function App() {
         <Navbar />
         <Welcome />
       </div>
-      <Services />
+      {/* <Services />
       <Transactions />
-      <Footer />
+      <Footer /> */}
     </div>
   )
 }
