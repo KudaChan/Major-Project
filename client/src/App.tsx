@@ -1,15 +1,16 @@
-import { Navbar, Welcome, Footer, Services, Transactions } from "./components"
+import { Navbar, Welcome, Transactions, Footer } from './components';
 
-export default function App() {
+const App = () => {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen pt-20"> {/* Added pt-20 for padding-top */}
       <div className="gradient-bg-welcome">
         <Navbar />
         <Welcome />
       </div>
-      {/* <Services />
       <Transactions />
-      <Footer /> */}
+      <Footer />
     </div>
   )
 }
+
+export default App;

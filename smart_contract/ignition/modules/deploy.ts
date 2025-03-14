@@ -1,21 +1,17 @@
-const main = async () => {
-  const hre = require("hardhat");
-  const Transactions = await hre.ethers.getContractFactory("Transactions");
-  const transactions = await Transactions.deploy();
+import { HardhatRuntimeEnvironment } from "hardhat/types";
 
-  if (!transactions) {
-    console.error("Contract deployment failed");
-    return;
-  }
+const main = async (hre: HardhatRuntimeEnvironment) => {
+  const transactionsFactory = await hre.ethers.getContractFactory("Transactions");
+  const transactionsContract = await transactionsFactory.deploy();
 
-  // await transactions.deployed();
+  await transactionsContract.waitForDeployment();
 
-  console.log("Transactions address: ", transactions.runner.address);
+  console.log("Transactions address: ", await transactionsContract.getAddress());
 };
 
 const runMain = async () => {
   try {
-    await main();
+    await main(require("hardhat"));
     process.exit(0);
   } catch (error) {
     console.error(error);

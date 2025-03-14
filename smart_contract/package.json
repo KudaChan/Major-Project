@@ -1,17 +1,17 @@
 {
   "name": "smart_contract",
   "version": "1.0.0",
+  "description": "Smart contract for dapp blockpay",
+  "license": "ISC",
+  "author": "Chandan Kumar",
+  "type": "commonjs",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "Chandan Kumar",
-  "license": "ISC",
-  "description": "",
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
-    "hardhat": "^2.22.16",
-    "viem": "^2.21.50"
+    "hardhat": "^2.22.19",
+    "ts-node": "^10.9.2"
   }
 }
