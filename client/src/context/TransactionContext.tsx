@@ -239,7 +239,13 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({ childr
     } catch (error) {
       console.error("Transaction error:", error);
       setIsLoading(false);
-      throw new Error("Failed to send transaction");
+      
+      // Better error message
+      let errorMessage = "Failed to send transaction";
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      alert(`Transaction failed: ${errorMessage}`);
     }
   }
 

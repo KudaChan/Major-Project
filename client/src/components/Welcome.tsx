@@ -51,12 +51,14 @@ const Welcome = () => {
   const handleSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     const { addressTo, amount, keyword, message } = formData;
-
-    if (!addressTo || !amount || !keyword || !message) {
-      alert("Please fill all fields");
-      return;
-    }
-
+    
+    // Improved validation
+    if (!addressTo) return alert("Please enter a recipient address");
+    if (!amount || isNaN(Number(amount)) || Number(amount) <= 0) 
+      return alert("Please enter a valid amount");
+    if (!keyword) return alert("Please enter a keyword");
+    if (!message) return alert("Please enter a message");
+    
     sendTransaction();
   };
 

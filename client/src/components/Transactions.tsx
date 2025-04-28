@@ -1,6 +1,7 @@
-import { useContext } from "react";
+import { useContext, useMemo } from "react";
 import { TransactionContext } from "../context/TransactionContext";
 import { shortenAddress } from "../utils/shortenAddress";
+import Loader from "../components/Loader";
 
 const TransactionsCard = ({ addressTo, addressFrom, timestamp, message, amount }: {
   addressTo: string,
@@ -53,8 +54,14 @@ const TransactionsCard = ({ addressTo, addressFrom, timestamp, message, amount }
 };
 
 const Transactions = () => {
-  const { transactions = [], currentAccount } = useContext(TransactionContext);
-
+  const { transactions = [], currentAccount, isLoading } = useContext(TransactionContext);
+  
+  // Memoize reversed transactions
+  const reversedTransactions = useMemo(() => 
+    [...transactions].reverse(), 
+    [transactions]
+  );
+  
   return (
     <div className="flex w-full justify-center items-center 2xl:px-20 gradient-bg-transactions">
       <div className="flex flex-col md:p-12 py-12 px-4 max-w-[1200px] w-full">
@@ -69,20 +76,28 @@ const Transactions = () => {
         )}
 
         <div className="mt-10">
-          {transactions.reverse().map((transaction, i) => {
-            const formattedTransaction = {
-              addressTo: transaction.addressTo,
-              addressFrom: transaction.addressFrom,
-              timestamp: transaction.timestamp,
-              message: transaction.message,
-              amount: typeof transaction.amount === 'string' ? parseFloat(transaction.amount) : transaction.amount,
-            };
+          {isLoading ? (
+            <div className="flex justify-center">
+              <Loader />
+            </div>
+          ) : (
+            <>
+              {reversedTransactions.map((transaction, i) => {
+                const formattedTransaction = {
+                  addressTo: transaction.addressTo,
+                  addressFrom: transaction.addressFrom,
+                  timestamp: transaction.timestamp,
+                  message: transaction.message,
+                  amount: typeof transaction.amount === 'string' ? parseFloat(transaction.amount) : transaction.amount,
+                };
 
-            return <TransactionsCard key={i} {...formattedTransaction} />;
-          })}
-
-          {transactions.length === 0 && currentAccount && (
-            <p className="text-white text-center">No transactions found</p>
+                return <TransactionsCard key={i} {...formattedTransaction} />;
+              })}
+              
+              {transactions.length === 0 && currentAccount && (
+                <p className="text-white text-center">No transactions found</p>
+              )}
+            </>
           )}
         </div>
       </div>
