@@ -14,7 +14,6 @@ interface Transaction {
   addressFrom: string;
   timestamp: string;
   message: string;
-  keyword: string;
   amount: number;
 }
 
@@ -22,12 +21,16 @@ interface TransactionContextProps {
   transactionCount: string;
   connectWallet: () => void;
   currentAccount: string | null;
-  formData: { addressTo: string, amount: string, keyword: string, message: string };
-  setFormData: (formData: { addressTo: string, amount: string, keyword: string, message: string }) => void;
+  formData: { addressTo: string, amount: string, message: string };
+  setFormData: (formData: { addressTo: string, amount: string, message: string }) => void;
   handleChange: (e: React.ChangeEvent<HTMLInputElement>, name: string) => void;
   sendTransaction: () => void;
   transactions: Transaction[];
   isLoading: boolean;
+  
+  // New props for multi-account support
+  accounts: string[];
+  switchAccount: (account: string) => void;
 }
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -51,11 +54,14 @@ interface TransactionProviderProps {
 }
 export const TransactionProvider: React.FC<TransactionProviderProps> = ({ children }) => {
   const [currentAccount, setCurrentAccount] = useState<string | null>(null);
-  const [formData, setFormData] = useState<{ addressTo: string, amount: string, keyword: string, message: string }>({ addressTo: '', amount: '', keyword: '', message: '' });
+  const [formData, setFormData] = useState<{ addressTo: string, amount: string, message: string }>({ addressTo: '', amount: '', message: '' });
 
   const [isLoading, setIsLoading] = useState(false);
   const [transactionCount, setTransactionCount] = useState(localStorage.getItem('transactionCount') || '0');
   const [transactions, setTransactions] = useState([]);
+  
+  // New state for multiple accounts
+  const [accounts, setAccounts] = useState<string[]>([]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>, name: string) => {
     setFormData((prevState) => ({ ...prevState, [name]: e.target.value }));
@@ -72,7 +78,6 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({ childr
           sender: string;
           timestamp: bigint | number;
           message: string;
-          keyword: string;
           amount: { _hex: string } | bigint;
         }) => {
           // Convert timestamp to number
@@ -98,7 +103,6 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({ childr
             addressFrom: transaction.sender,
             timestamp: new Date(timestampNum * 1000).toLocaleString(),
             message: transaction.message,
-            keyword: transaction.keyword,
             amount: amountNum
           };
         });
@@ -165,8 +169,24 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({ childr
       console.log("Accounts received:", accounts);
 
       if (accounts && accounts.length > 0) {
-        setCurrentAccount(accounts[0]);
-        console.log("Wallet connected successfully:", accounts[0]);
+        // Update accounts list with any new accounts
+        setAccounts(prevAccounts => {
+          // Create a Set from previous accounts to avoid duplicates
+          const accountSet = new Set([...prevAccounts]);
+          
+          // Add all newly connected accounts
+          accounts.forEach(account => accountSet.add(account));
+          
+          // Convert back to array
+          return Array.from(accountSet);
+        });
+        
+        // If no current account is set, set the first one
+        if (!currentAccount) {
+          setCurrentAccount(accounts[0]);
+        }
+        
+        console.log("Wallet connected successfully:", accounts);
         alert("Wallet connected successfully!");
       } else {
         console.error("No accounts found");
@@ -182,13 +202,21 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({ childr
     } finally {
       setIsLoading(false);
     }
-  }
+  };
+
+  // Function to switch between accounts
+  const switchAccount = (account: string) => {
+    if (accounts.includes(account)) {
+      setCurrentAccount(account);
+      getAllTransactions(); // Refresh transactions for the new account
+    }
+  };
 
   const sendTransaction = async () => {
     try {
       if (!ethereum) return alert("Please install MetaMask!");
 
-      const { addressTo, amount, keyword, message } = formData;
+      const { addressTo, amount, message } = formData;
       const transactionContract = await getEthereumContract();
 
       const parsedAmount = ethers.parseUnits(amount, "ether");
@@ -203,7 +231,7 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({ childr
         }]
       });
 
-      const transactionHash = await transactionContract.addToBlockchain(addressTo, parsedAmount, keyword, message);
+      const transactionHash = await transactionContract.addToBlockchain(addressTo, parsedAmount, message);
 
       setIsLoading(true);
       console.log(`Loading - ${transactionHash.hash}`);
@@ -229,10 +257,19 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({ childr
       }
 
       setTransactionCount(count);
-      setIsLoading(false);
-
+      
       // Clear form data after successful transaction
-      setFormData({ addressTo: '', amount: '', keyword: '', message: '' });
+      // This is the key part that needs to be fixed
+      setFormData({ 
+        addressTo: '', 
+        amount: '', 
+        message: '' 
+      });
+      
+      // Refresh transactions list
+      getAllTransactions();
+      
+      setIsLoading(false);
 
       alert(`Transaction sent successfully. Transaction Hash: ${transactionHash.hash}`);
 
@@ -253,6 +290,30 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({ childr
     checkIfWalletIsConnected();
     checkIfTransactionsExists();
   }, [checkIfWalletIsConnected, transactionCount]);
+
+  // Add listener for account changes in MetaMask
+  useEffect(() => {
+    if (ethereum) {
+      ethereum.on('accountsChanged', (newAccounts: unknown) => {
+        const accountsList = newAccounts as string[];
+        if (accountsList && accountsList.length > 0) {
+          setAccounts(accountsList);
+          setCurrentAccount(accountsList[0]);
+          getAllTransactions();
+        } else {
+          setAccounts([]);
+          setCurrentAccount(null);
+        }
+      });
+    }
+
+    return () => {
+      if (ethereum && ethereum.removeListener) {
+        ethereum.removeListener('accountsChanged', () => {});
+      }
+    };
+  }, []);
+
   return (
     <TransactionContext.Provider
       value={{
@@ -264,7 +325,9 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({ childr
         isLoading,
         handleChange,
         sendTransaction,
-        transactions
+        transactions,
+        accounts,
+        switchAccount
       }}>
       {children}
     </TransactionContext.Provider>

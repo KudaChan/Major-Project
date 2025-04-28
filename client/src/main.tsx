@@ -6,8 +6,8 @@ import { TransactionProvider } from './context/TransactionContext'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <TransactionProvider>
-      <App />
-    </TransactionProvider>
+      <TransactionProvider>
+        <App />
+      </TransactionProvider>
   </StrictMode>,
 )

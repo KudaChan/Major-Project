@@ -1,24 +1,37 @@
-import React from "react";
 import { HiMenuAlt4 } from "react-icons/hi";
 import { AiOutlineClose } from "react-icons/ai";
+import { useState, useContext } from "react";
+import { TransactionContext } from "../context/TransactionContext";
+import AccountSelector from "./AccountSelector";
 
 const NavBarItem = ({ title, classprops } : { title: string, classprops?: string }) => (
   <li className={`mx-4 cursor-pointer ${classprops}`}>{title}</li>
 );
 
 const Navbar = () => {
-  const [toggleMenu, setToggleMenu] = React.useState(false);
+  const [toggleMenu, setToggleMenu] = useState(false);
+  const { currentAccount, accounts } = useContext(TransactionContext);
+  
+  // Debug log
+  console.log("Navbar render - currentAccount:", currentAccount);
+  console.log("Navbar render - accounts:", accounts);
 
   return (
     <nav className="fixed top-0 left-0 right-0 w-full flex md:justify-center justify-between items-center p-4 backdrop-blur-sm bg-transparent bg-opacity-50 z-50">
       <div className="md:flex-[0.5] flex-initial justify-center items-center">
         <span className="text-xl font-bold text-white w-32">BlockPay</span>
       </div>
-      <button
-        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-        className="bg-[#2952e3] py-2 px-7 mx-4 rounded-full cursor-pointer hover:bg-[#2546bd] text-white">
-          Pay Now
-      </button>
+      
+      <div className="flex items-center">
+        {currentAccount && <AccountSelector />}
+        
+        <button
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          className="bg-[#2952e3] py-2 px-7 mx-4 rounded-full cursor-pointer hover:bg-[#2546bd] text-white">
+            Pay Now
+        </button>
+      </div>
+      
       <div className="flex relative">
         {!toggleMenu && (
           <HiMenuAlt4 fontSize={28} className="text-white md:hidden cursor-pointer" onClick={() => setToggleMenu(true)} />

@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext} from "react";
 import { AiFillPlayCircle } from "react-icons/ai";
 import { SiEthereum } from "react-icons/si";
 import { BsInfoCircle } from "react-icons/bs";
@@ -20,49 +20,43 @@ interface inputProps {
 const Input = ({ placeholder, name, type, value, handleChange }: inputProps) => (
   <input
     placeholder={placeholder}
-    type={type}
+    type={type || "text"}
     step="0.0001"
-    value={value}
+    value={value || ""}
     onChange={(e) => handleChange(e, name)}
-    className="my-2 w-full rounded-xs p-2 outline-hidden bg-transparent text-white border-none text-sm white-glassmorphism"
+    className="my-2 w-full rounded-sm p-2 outline-none bg-transparent text-white border-none text-sm white-glassmorphism"
   />
 );
 
 const Welcome = () => {
   const context = useContext(TransactionContext);
 
-  // Early return if context is not available
   if (!context) {
-    console.log("Context not available");
     return <div>Loading...</div>;
   }
 
-  const { currentAccount, connectWallet, handleChange, sendTransaction, formData, isLoading } = context;
+  const { currentAccount, connectWallet, handleChange, sendTransaction, formData, isLoading, accounts } = context;
 
   const handleConnectWallet = async () => {
-    console.log("Connect wallet button clicked");
     try {
       await connectWallet();
     } catch (error) {
-      console.error("Error in handleConnectWallet:", error);
+      console.error(error);
     }
   };
 
   const handleSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    const { addressTo, amount, keyword, message } = formData;
+    const { addressTo, amount, message } = formData;
     
-    // Improved validation
     if (!addressTo) return alert("Please enter a recipient address");
     if (!amount || isNaN(Number(amount)) || Number(amount) <= 0) 
       return alert("Please enter a valid amount");
-    if (!keyword) return alert("Please enter a keyword");
     if (!message) return alert("Please enter a message");
     
     sendTransaction();
   };
 
-  // Update Input component calls to ensure type safety
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>, name: string) => {
     if (handleChange) {
       handleChange(e, name);
@@ -129,6 +123,11 @@ const Welcome = () => {
                 <p className="text-white font-light text-sm">
                   {currentAccount ? shortenAddress(currentAccount) : "Connect Wallet"}
                 </p>
+                {accounts && accounts.length > 1 && (
+                  <p className="text-white text-xs opacity-70">
+                    {`Account ${accounts.indexOf(currentAccount || '') + 1} of ${accounts.length}`}
+                  </p>
+                )}
                 <p className="text-white font-semibold text-lg mt-1">
                   Ethereum
                 </p>
@@ -140,24 +139,21 @@ const Welcome = () => {
               placeholder="Address To"
               name="addressTo"
               type="text"
+              value={formData.addressTo}
               handleChange={handleInputChange}
             />
             <Input
               placeholder="Amount (ETH)"
               name="amount"
               type="number"
-              handleChange={handleInputChange}
-            />
-            <Input
-              placeholder="Keyword (Gif)"
-              name="keyword"
-              type="text"
+              value={formData.amount}
               handleChange={handleInputChange}
             />
             <Input
               placeholder="Enter Message"
               name="message"
               type="text"
+              value={formData.message}
               handleChange={handleInputChange}
             />
 
