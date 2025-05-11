@@ -1,10 +1,30 @@
+/**
+ * useFetch.tsx
+ * 
+ * Custom React hook for fetching GIFs from the Giphy API.
+ * Used to display transaction-related animations based on keywords.
+ * Falls back to a default GIF if the API key is missing or request fails.
+ */
 import { useEffect, useState } from "react";
 
+// Get API key from environment variables
 const APIKEY = import.meta.env.VITE_GIPHY_API;
 
+/**
+ * useFetch hook
+ * Fetches a GIF from Giphy API based on the provided keyword
+ * 
+ * @param keyword - Search term for the GIF
+ * @returns Object containing the fetched GIF URL
+ */
 const useFetch = ({ keyword }: { keyword: string }) => {
+  // State to store the GIF URL
   const [gifUrl, setGifUrl] = useState("");
 
+  /**
+   * Fetches GIFs from Giphy API
+   * Sets a default GIF if the API key is missing or request fails
+   */
   const fetchGifs = async () => {
     try {
       if (!APIKEY) {

@@ -1,14 +1,25 @@
+/**
+ * TransactionContext.tsx
+ * 
+ * This file implements the core blockchain interaction functionality using React Context API.
+ * It provides wallet connection, transaction handling, and blockchain state management
+ * for the entire application.
+ */
 import React, { useEffect, useState, createContext, useCallback } from "react";
 import { ethers } from "ethers";
 import { MetaMaskInpageProvider } from "@metamask/providers";
 import { contractABI, contractAddress } from "../utils/constants";
 
+// Add MetaMask type to global window object
 declare global {
   interface Window {
     ethereum?: MetaMaskInpageProvider
   }
 }
 
+/**
+ * Transaction interface defining the structure of blockchain transactions
+ */
 interface Transaction {
   addressTo: string;
   addressFrom: string;
@@ -17,6 +28,9 @@ interface Transaction {
   amount: number;
 }
 
+/**
+ * TransactionContextProps interface defining all context values and methods
+ */
 interface TransactionContextProps {
   transactionCount: string;
   connectWallet: () => void;

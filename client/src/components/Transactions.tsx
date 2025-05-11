@@ -1,8 +1,25 @@
+/**
+ * Transactions.tsx
+ * 
+ * Component for displaying transaction history.
+ * Fetches and renders all blockchain transactions from the smart contract.
+ * Provides transaction details including addresses, amounts, and timestamps.
+ */
 import { useContext, useMemo } from "react";
 import { TransactionContext } from "../context/TransactionContext";
 import { shortenAddress } from "../utils/shortenAddress";
 import Loader from "../components/Loader";
 
+/**
+ * TransactionsCard component
+ * Renders an individual transaction card with details about the transaction
+ * 
+ * @param addressTo - Recipient address
+ * @param addressFrom - Sender address
+ * @param timestamp - Transaction timestamp
+ * @param message - Optional message included with transaction
+ * @param amount - Transaction amount in ETH
+ */
 const TransactionsCard = ({ addressTo, addressFrom, timestamp, message, amount }: {
   addressTo: string,
   addressFrom: string,

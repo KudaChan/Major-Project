@@ -9,7 +9,11 @@ import { Loader } from ".";
 
 const companyCommonStyles = "min-h-[70px] sm:px-0 px-2 sm:min-w-[120px] flex justify-center items-center border-[0.5px] border-gray-400 text-sm font-light text-white";
 
-interface inputProps {
+/**
+ * Input component for transaction form fields
+ * Renders a styled input with customizable placeholder, name, type and value
+ */
+interface InputProps {
   placeholder: string;
   name: string;
   type?: string;
@@ -17,7 +21,7 @@ interface inputProps {
   handleChange: (e: React.ChangeEvent<HTMLInputElement>, name: string) => void;
 }
 
-const Input = ({ placeholder, name, type, value, handleChange }: inputProps) => (
+const Input = ({ placeholder, name, type, value, handleChange }: InputProps) => (
   <input
     placeholder={placeholder}
     type={type || "text"}
@@ -28,6 +32,10 @@ const Input = ({ placeholder, name, type, value, handleChange }: inputProps) => 
   />
 );
 
+/**
+ * Welcome component - Main landing page for the application
+ * Displays wallet connection status, transaction form, and recent activity
+ */
 const Welcome = () => {
   const context = useContext(TransactionContext);
 
