@@ -10,7 +10,7 @@ import abi from "./Transactions.json";
 /**
  * Address of the deployed smart contract on Sepolia testnet
  */
-export const contractAddress = "0x131E5339E3127B2Df20fe04157d4072dCc12F898";
+export const contractAddress = "0x15b08E77748753EDDF716F72642A15b7790C15Ec";
 
 /**
  * ABI (Application Binary Interface) of the smart contract

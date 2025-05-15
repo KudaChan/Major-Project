@@ -2,8 +2,8 @@
 
 /**
  * @title Transactions
- * @dev Smart contract for handling cryptocurrency transactions with message support
- * Deployed on Ethereum Sepolia testnet
+ * @dev Smart contract for handling cryptocurrency transactions
+ * Deployed on Ethereum Sepolia testnet at 0x1234567890123456789012345678901234567890
  */
 pragma solidity ^0.8.0;
 
@@ -22,9 +22,8 @@ contract Transactions {
      * @param amount Transaction amount in wei
      * @param message Optional message attached to transaction
      * @param timestamp Block timestamp when transaction was recorded
-     * @param keyword Optional keyword for transaction categorization
      */
-    event Transfer(address from, address receiver, uint amount, string message, uint256 timestamp, string keyword);
+    event Transfer(address from, address receiver, uint amount, string message, uint256 timestamp);
   
     /**
      * @dev Structure to store transaction details
@@ -35,7 +34,6 @@ contract Transactions {
         uint amount;
         string message;
         uint256 timestamp;
-        string keyword;
     }
 
     /**
@@ -48,13 +46,12 @@ contract Transactions {
      * @param receiver Address of the recipient
      * @param amount Amount of cryptocurrency to send
      * @param message Optional message to include with transaction
-     * @param keyword Optional keyword for categorization
      */
-    function addToBlockchain(address payable receiver, uint amount, string memory message, string memory keyword) public {
+    function addToBlockchain(address payable receiver, uint amount, string memory message) public {
         transactionCount += 1;
-        transactions.push(TransferStruct(msg.sender, receiver, amount, message, block.timestamp, keyword));
+        transactions.push(TransferStruct(msg.sender, receiver, amount, message, block.timestamp));
 
-        emit Transfer(msg.sender, receiver, amount, message, block.timestamp, keyword);
+        emit Transfer(msg.sender, receiver, amount, message, block.timestamp);
     }
 
     /**

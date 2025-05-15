@@ -245,7 +245,11 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({ childr
         }]
       });
 
-      const transactionHash = await transactionContract.addToBlockchain(addressTo, parsedAmount, message);
+      const transactionHash = await transactionContract.addToBlockchain(
+        addressTo,
+        parsedAmount,
+        message
+      );
 
       setIsLoading(true);
       console.log(`Loading - ${transactionHash.hash}`);
